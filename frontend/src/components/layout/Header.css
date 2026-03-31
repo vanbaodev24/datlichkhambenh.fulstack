@@ -1,0 +1,40 @@
+.header {
+  position: sticky; top: 0; z-index: 1000;
+  background: #fff; border-bottom: 1px solid var(--border);
+  box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+}
+.header-inner {
+  display: flex; align-items: center; gap: 32px;
+  height: 68px;
+}
+.logo { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.3rem; color: var(--primary); }
+.logo-icon { font-size: 1.6rem; }
+.logo-text { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.nav { display: flex; align-items: center; gap: 4px; margin-left: auto; }
+.nav-link { padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.9rem; color: var(--text-medium); transition: var(--transition); }
+.nav-link:hover { color: var(--primary); background: var(--primary-light); }
+
+.header-actions { display: flex; align-items: center; gap: 12px; }
+.auth-btns { display: flex; gap: 8px; }
+
+.user-menu { display: flex; align-items: center; gap: 8px; cursor: pointer; position: relative; padding: 6px 10px; border-radius: var(--radius-sm); transition: var(--transition); }
+.user-menu:hover { background: var(--bg-light); }
+.user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.95rem; overflow: hidden; }
+.user-avatar img { width: 100%; height: 100%; object-fit: cover; }
+.user-name { font-weight: 600; font-size: 0.9rem; color: var(--text-dark); }
+.chevron { font-size: 0.75rem; color: var(--text-light); }
+
+.dropdown { position: absolute; top: calc(100% + 8px); right: 0; background: #fff; border-radius: var(--radius); box-shadow: var(--shadow-lg); min-width: 200px; overflow: hidden; border: 1px solid var(--border); }
+.drop-item { display: block; width: 100%; padding: 12px 18px; text-align: left; font-size: 0.9rem; font-weight: 500; color: var(--text-dark); background: none; border: none; cursor: pointer; transition: background 0.15s; font-family: inherit; }
+.drop-item:hover { background: var(--bg-light); color: var(--primary); }
+.drop-logout { color: var(--danger) !important; border-top: 1px solid var(--border); }
+
+.burger { display: none; background: none; border: none; font-size: 1.5rem; cursor: pointer; }
+
+@media (max-width: 768px) {
+  .nav { display: none; position: fixed; top: 68px; left: 0; right: 0; background: #fff; flex-direction: column; padding: 16px; border-bottom: 1px solid var(--border); box-shadow: var(--shadow); }
+  .nav.open { display: flex; }
+  .burger { display: block; }
+  .user-name { display: none; }
+}

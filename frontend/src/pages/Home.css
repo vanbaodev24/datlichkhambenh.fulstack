@@ -1,0 +1,112 @@
+/* Hero */
+.hero { position: relative; overflow: hidden; background: linear-gradient(135deg, #0d2137 0%, #1a3a52 60%, #0e4a6b 100%); min-height: 580px; display: flex; align-items: center; }
+.hero-bg { position: absolute; inset: 0; background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%2345c3d2' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='15'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E"); }
+.hero-content { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; padding: 80px 0; position: relative; z-index: 1; }
+.hero-text { color: #fff; }
+.hero-badge { display: inline-block; background: rgba(69,195,210,0.18); border: 1px solid rgba(69,195,210,0.3); color: var(--primary); padding: 6px 16px; border-radius: 20px; font-size: 0.82rem; font-weight: 600; margin-bottom: 20px; }
+.hero-text h1 { font-size: 3rem; font-weight: 800; line-height: 1.15; margin-bottom: 18px; }
+.hero-text h1 span { color: var(--primary); }
+.hero-text p { font-size: 1.05rem; color: rgba(255,255,255,0.75); margin-bottom: 28px; line-height: 1.7; }
+
+.search-bar { display: flex; align-items: center; background: #fff; border-radius: var(--radius); padding: 8px 8px 8px 16px; gap: 10px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+.search-icon { font-size: 1.1rem; }
+.search-bar input { flex: 1; border: none; outline: none; font-size: 0.95rem; font-family: inherit; color: var(--text-dark); }
+.search-bar input::placeholder { color: var(--text-light); }
+
+.hero-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.hero-tag { padding: 6px 14px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: rgba(255,255,255,0.85); border-radius: 20px; font-size: 0.82rem; font-weight: 500; transition: var(--transition); }
+.hero-tag:hover { background: var(--primary); border-color: var(--primary); }
+
+.hero-image { position: relative; display: flex; justify-content: center; align-items: center; height: 380px; }
+.hero-illustration { width: 280px; height: 280px; border-radius: 50%; background: radial-gradient(circle at 30% 30%, rgba(69,195,210,0.25), rgba(69,195,210,0.05)); border: 2px solid rgba(69,195,210,0.2); display: flex; align-items: center; justify-content: center; position: relative; }
+.hero-circle-1 { position: absolute; width: 320px; height: 320px; border-radius: 50%; border: 1px dashed rgba(69,195,210,0.2); animation: rotate 20s linear infinite; }
+.hero-circle-2 { position: absolute; width: 360px; height: 360px; border-radius: 50%; border: 1px dashed rgba(69,195,210,0.1); animation: rotate 30s linear infinite reverse; }
+@keyframes rotate { to { transform: rotate(360deg); } }
+.hero-emoji { font-size: 5rem; }
+
+.hero-card-float { position: absolute; background: #fff; border-radius: var(--radius-sm); padding: 12px 16px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-lg); font-size: 0.82rem; }
+.hero-card-float span { font-size: 1.4rem; }
+.hero-card-float strong { display: block; font-weight: 700; font-size: 0.88rem; color: var(--text-dark); }
+.hero-card-float p { color: var(--text-medium); margin: 0; }
+.hero-card-1 { top: 30px; left: -20px; animation: float 3s ease-in-out infinite; }
+.hero-card-2 { bottom: 50px; right: -10px; animation: float 3s ease-in-out infinite 1.5s; }
+@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+
+/* Stats */
+.stats-bar { background: #fff; border-bottom: 1px solid var(--border); }
+.stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); }
+.stat-item { padding: 32px 20px; text-align: center; border-right: 1px solid var(--border); }
+.stat-item:last-child { border-right: none; }
+.stat-icon { font-size: 1.8rem; margin-bottom: 8px; }
+.stat-value { font-size: 1.8rem; font-weight: 800; color: var(--primary); }
+.stat-label { font-size: 0.85rem; color: var(--text-medium); margin-top: 4px; }
+
+/* Section header */
+.section-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 32px; }
+
+/* Specialty */
+.specialty-grid { display: grid; grid-template-columns: repeat(8, 1fr); gap: 14px; }
+.specialty-card { background: #fff; border-radius: var(--radius); padding: 20px 12px; text-align: center; font-size: 0.85rem; font-weight: 600; color: var(--text-dark); box-shadow: var(--shadow-sm); transition: var(--transition); display: flex; flex-direction: column; align-items: center; gap: 10px; border: 1.5px solid transparent; }
+.specialty-card:hover { border-color: var(--primary); color: var(--primary); transform: translateY(-3px); box-shadow: var(--shadow); }
+.specialty-icon { font-size: 2rem; }
+
+/* Doctors */
+.doctor-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.doctor-card { display: block; }
+.doctor-card-top { position: relative; padding: 24px 0 16px; text-align: center; background: linear-gradient(135deg, var(--primary-light), #fff); }
+.doctor-avatar-wrap { width: 90px; height: 90px; margin: 0 auto; border-radius: 50%; overflow: hidden; border: 3px solid var(--primary); }
+.doctor-avatar-img { width: 100%; height: 100%; object-fit: cover; }
+.doctor-avatar-placeholder { width: 100%; height: 100%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 2rem; font-weight: 700; }
+.doctor-rating { position: absolute; top: 14px; right: 14px; background: #fff; border-radius: 20px; padding: 3px 10px; font-size: 0.78rem; font-weight: 700; box-shadow: var(--shadow-sm); }
+.doctor-card-body { padding: 16px; }
+.doctor-position { font-size: 0.75rem; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+.doctor-card-body h3 { font-size: 1rem; font-weight: 700; margin: 4px 0; }
+.doctor-specialty { font-size: 0.85rem; color: var(--text-medium); }
+.doctor-price { margin-top: 8px; font-weight: 700; color: var(--secondary); font-size: 0.9rem; }
+
+/* Clinic */
+.clinic-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+.clinic-card { display: block; }
+.clinic-img { height: 160px; overflow: hidden; background: var(--primary-light); display: flex; align-items: center; justify-content: center; }
+.clinic-img img { width: 100%; height: 100%; object-fit: cover; }
+.clinic-img-placeholder { font-size: 4rem; }
+.clinic-info { padding: 16px; }
+.clinic-info h3 { font-weight: 700; font-size: 0.95rem; margin-bottom: 6px; }
+.clinic-info p { font-size: 0.82rem; color: var(--text-medium); }
+
+/* Features */
+.features-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; }
+.feature-card { background: #fff; border-radius: var(--radius); padding: 28px 24px; text-align: center; box-shadow: var(--shadow-sm); }
+.feature-icon { font-size: 2.5rem; margin-bottom: 16px; }
+.feature-card h3 { font-weight: 700; font-size: 0.95rem; margin-bottom: 10px; }
+.feature-card p { font-size: 0.85rem; color: var(--text-medium); line-height: 1.6; }
+
+/* CTA */
+.cta-section { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); color: #fff; padding: 56px 0; }
+.cta-inner { display: flex; align-items: center; justify-content: space-between; gap: 32px; }
+.cta-inner h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 10px; }
+.cta-inner p { opacity: 0.9; font-size: 0.95rem; }
+.cta-section .btn-primary { background: #fff; color: var(--primary); }
+.cta-section .btn-primary:hover { background: rgba(255,255,255,0.9); }
+
+.section-tinted { background: var(--bg-light); }
+
+@media (max-width: 1024px) {
+  .specialty-grid { grid-template-columns: repeat(4, 1fr); }
+  .doctor-grid, .clinic-grid, .features-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 768px) {
+  .hero-content { grid-template-columns: 1fr; gap: 32px; padding: 50px 0; }
+  .hero-image { display: none; }
+  .hero-text h1 { font-size: 2.1rem; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-item { border-right: none; border-bottom: 1px solid var(--border); }
+  .section-header { flex-direction: column; align-items: flex-start; gap: 12px; }
+  .specialty-grid { grid-template-columns: repeat(4, 1fr); }
+  .cta-inner { flex-direction: column; text-align: center; }
+}
+@media (max-width: 480px) {
+  .specialty-grid { grid-template-columns: repeat(2, 1fr); }
+  .doctor-grid, .clinic-grid, .features-grid { grid-template-columns: 1fr; }
+  .stats-grid { grid-template-columns: 1fr 1fr; }
+}

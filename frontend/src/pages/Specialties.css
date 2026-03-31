@@ -1,0 +1,11 @@
+.sp-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px; }
+.sp-card { display: block; overflow: hidden; }
+.sp-img { height: 160px; background: linear-gradient(135deg, var(--primary-light), #e0f7fa); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.sp-img img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.3s; }
+.sp-card:hover .sp-img img { transform: scale(1.05); }
+.sp-icon { font-size: 4rem; }
+.sp-body { padding: 18px; }
+.sp-body h3 { font-size: 1rem; font-weight: 700; color: var(--text-dark); margin-bottom: 8px; }
+.sp-link { font-size: 0.82rem; color: var(--primary); font-weight: 600; }
+@media (max-width: 900px) { .sp-grid { grid-template-columns: repeat(3, 1fr); } }
+@media (max-width: 600px) { .sp-grid { grid-template-columns: repeat(2, 1fr); } }

@@ -7,6 +7,7 @@
 ## 🛠️ Công nghệ sử dụng
 
 ### Frontend
+
 - **React.js 18** - UI framework
 - **Redux Toolkit** - State management
 - **React Router v6** - Routing
@@ -15,6 +16,7 @@
 - **Moment.js** - Date handling
 
 ### Backend
+
 - **Node.js + Express** - Server & API
 - **Sequelize ORM** - Database abstraction
 - **MySQL2** - Database driver (XAMPP)
@@ -55,12 +57,14 @@ bookingcare/
 ## ⚙️ Cài đặt và chạy
 
 ### Bước 1: Cài đặt XAMPP
+
 1. Tải XAMPP tại https://www.apachefriends.org/
 2. Khởi động **Apache** và **MySQL**
 3. Mở **phpMyAdmin** (http://localhost/phpmyadmin)
 4. Tạo database mới tên: `bookingcare`
 
 ### Bước 2: Cài đặt Backend
+
 ```bash
 cd backend
 npm install
@@ -76,6 +80,7 @@ node src/seeders/seed.js
 ```
 
 ### Bước 3: Cài đặt Frontend
+
 ```bash
 cd frontend
 npm install
@@ -83,6 +88,7 @@ npm start
 ```
 
 ### Bước 4: Truy cập ứng dụng
+
 - **Frontend**: http://localhost:3000
 - **Backend API**: http://localhost:8080
 - **phpMyAdmin**: http://localhost/phpmyadmin
@@ -91,15 +97,16 @@ npm start
 
 ## 🔑 Tài khoản mặc định (sau khi seed)
 
-| Vai trò | Email | Mật khẩu |
-|---------|-------|----------|
-| Admin | admin@bookingcare.vn | admin123 |
+| Vai trò | Email                | Mật khẩu |
+| ------- | -------------------- | -------- |
+| Admin   | admin@bookingcare.vn | admin123 |
 
 ---
 
 ## 📋 Tính năng chính
 
 ### Người dùng (Bệnh nhân)
+
 - ✅ Đăng ký / Đăng nhập
 - ✅ Tìm kiếm bác sĩ theo tên, chuyên khoa
 - ✅ Xem thông tin chi tiết bác sĩ
@@ -108,11 +115,13 @@ npm start
 - ✅ Xem lịch sử lịch hẹn
 
 ### Bác sĩ
+
 - ✅ Dashboard quản lý lịch hẹn
 - ✅ Xem danh sách bệnh nhân
 - ✅ Cập nhật trạng thái lịch hẹn
 
 ### Admin
+
 - ✅ Dashboard tổng quan
 - ✅ Quản lý người dùng (CRUD)
 - ✅ Quản lý hồ sơ bác sĩ
@@ -125,6 +134,7 @@ npm start
 ## 🗄️ API Endpoints
 
 ### Auth
+
 ```
 POST /api/v1/auth/register    - Đăng ký
 POST /api/v1/auth/login       - Đăng nhập
@@ -132,6 +142,7 @@ GET  /api/v1/auth/profile     - Xem hồ sơ
 ```
 
 ### Doctors
+
 ```
 GET  /api/v1/doctors          - Danh sách bác sĩ
 GET  /api/v1/doctors/top      - Top bác sĩ
@@ -142,6 +153,7 @@ POST /api/v1/doctors/info     - Cập nhật hồ sơ (Admin)
 ```
 
 ### Bookings
+
 ```
 POST /api/v1/bookings              - Tạo lịch hẹn
 GET  /api/v1/bookings/patient      - Lịch hẹn của bệnh nhân
@@ -151,6 +163,7 @@ PUT  /api/v1/bookings/:id/status   - Cập nhật trạng thái
 ```
 
 ### Specialties & Clinics
+
 ```
 GET/POST/PUT/DELETE /api/v1/specialties/:id
 GET/POST/PUT/DELETE /api/v1/clinics/:id
@@ -165,11 +178,8 @@ GET/POST/PUT/DELETE /api/v1/clinics/:id
 3. **CORS**: Backend đã cấu hình CORS cho `localhost:3000`
 4. **Uploads folder**: Thư mục `backend/uploads/` được tạo tự động
 
----
-
-## 📞 Hỗ trợ
-
 Nếu gặp lỗi, kiểm tra:
+
 - XAMPP MySQL đang chạy
 - Database `bookingcare` đã được tạo
 - Đã chạy `npm install` ở cả backend và frontend
