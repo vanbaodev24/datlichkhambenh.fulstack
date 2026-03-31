@@ -9,20 +9,26 @@ const Doctors = () => {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const search = searchParams.get("search") || "";
   const specialtyId = searchParams.get("specialtyId") || "";
+  const searchQuery = searchParams.get("search") || "";
 
   useEffect(() => {
-    specialtyAPI.getAll().then((r) => setSpecialties(r.data || []));
+    specialtyAPI
+      .getAll()
+      .then((r) => setSpecialties(r.data || []))
+      .catch(() => setSpecialties([]));
   }, []);
 
   useEffect(() => {
     setLoading(true);
     const params = { page, limit: 12 };
-    if (search) params.search = search;
+    if (searchQuery) params.search = searchQuery;
     if (specialtyId) params.specialtyId = specialtyId;
+
+    console.log("=== FETCH DOCTORS ===", params);
 
     doctorAPI
       .getAll(params)
@@ -36,9 +42,16 @@ const Doctors = () => {
         setTotal(0);
       })
       .finally(() => setLoading(false));
-  }, [page, search, specialtyId]);
+  }, [page, searchQuery, specialtyId]);
 
   const totalPages = Math.ceil(total / 12);
+
+  const handleSearch = () => {
+    const val = searchInput.trim();
+    // Khi search theo tên: xóa specialtyId
+    setSearchParams(val ? { search: val } : {});
+    setPage(1);
+  };
 
   return (
     <div>
@@ -55,38 +68,30 @@ const Doctors = () => {
           <aside className="filters-sidebar">
             <h3>Lọc theo chuyên khoa</h3>
             <div className="filter-list">
-              <label className={`filter-item ${!specialtyId ? "active" : ""}`}>
-                <input
-                  type="radio"
-                  name="specialty"
-                  checked={!specialtyId}
-                  onChange={() => {
-                    setSearchParams(search ? { search } : {});
+              <div
+                className={`filter-item ${!specialtyId ? "active" : ""}`}
+                style={{ cursor: "pointer" }}
+                onClick={() => {
+                  setSearchInput("");
+                  setSearchParams({});
+                  setPage(1);
+                }}
+              >
+                Tất cả chuyên khoa
+              </div>
+              {specialties.map((sp) => (
+                <div
+                  key={sp.id}
+                  className={`filter-item ${String(specialtyId) === String(sp.id) ? "active" : ""}`}
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    setSearchInput("");
+                    setSearchParams({ specialtyId: String(sp.id) });
                     setPage(1);
                   }}
-                />
-                Tất cả chuyên khoa
-              </label>
-              {specialties.map((sp) => (
-                <label
-                  key={sp.id}
-                  className={`filter-item ${specialtyId == sp.id ? "active" : ""}`}
                 >
-                  <input
-                    type="radio"
-                    name="specialty"
-                    checked={specialtyId == sp.id}
-                    onChange={() => {
-                      setSearchParams(
-                        search
-                          ? { search, specialtyId: sp.id }
-                          : { specialtyId: sp.id },
-                      );
-                      setPage(1);
-                    }}
-                  />
                   {sp.name}
-                </label>
+                </div>
               ))}
             </div>
           </aside>
@@ -99,19 +104,35 @@ const Doctors = () => {
                 <input
                   type="text"
                   placeholder="Tìm theo tên bác sĩ..."
-                  defaultValue={search}
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
                   onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setSearchParams(
-                        e.target.value
-                          ? { search: e.target.value, specialtyId }
-                          : { specialtyId },
-                      );
-                      setPage(1);
-                    }
+                    if (e.key === "Enter") handleSearch();
                   }}
                 />
+                {searchInput && (
+                  <button
+                    onClick={() => {
+                      setSearchInput("");
+                      setSearchParams(specialtyId ? { specialtyId } : {});
+                      setPage(1);
+                    }}
+                    style={{
+                      background: "none",
+                      border: "none",
+                      cursor: "pointer",
+                      fontSize: "1rem",
+                      color: "var(--text-light)",
+                      padding: "0 4px",
+                    }}
+                  >
+                    ✕
+                  </button>
+                )}
               </div>
+              <button className="btn btn-primary btn-sm" onClick={handleSearch}>
+                Tìm
+              </button>
               <span className="result-count">{total} bác sĩ</span>
             </div>
 
@@ -128,7 +149,7 @@ const Doctors = () => {
                 {doctors.map((doc) => (
                   <Link
                     key={doc.id}
-                    to={`/doctors/${doc.userId}`}
+                    to={`/doctors/${doc.userData?.id}`}
                     className="doctor-list-card card"
                   >
                     <div className="dlc-avatar">
@@ -149,7 +170,7 @@ const Doctors = () => {
                         {doc.userData?.lastName} {doc.userData?.firstName}
                       </h3>
                       <p className="dlc-specialty">
-                        🏥 {doc.specialtyData?.name}
+                        🏥 {doc.specialtyData?.name || "Đa khoa"}
                       </p>
                       <p className="dlc-clinic">
                         📍 {doc.nameClinic || "Đang cập nhật"}

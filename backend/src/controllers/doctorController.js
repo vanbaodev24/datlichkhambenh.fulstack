@@ -10,17 +10,86 @@ const { Op } = require("sequelize");
 
 const getAllDoctors = async (req, res) => {
   try {
+    const { Sequelize } = require("sequelize");
     const { limit = 12, page = 1, specialtyId, search } = req.query;
     const offset = (page - 1) * limit;
-    const doctorWhere = {};
-    if (specialtyId) doctorWhere.specialtyId = specialtyId;
 
-    const userWhere = { isActive: true };
+    let matchedUserIds = [];
+    let matchedSpecialtyIds = [];
+    let matchedClinicIds = [];
+
     if (search) {
-      userWhere[Op.or] = [
-        { firstName: { [Op.like]: `%${search}%` } },
-        { lastName: { [Op.like]: `%${search}%` } },
+      // Tìm user khớp tên
+      const matchedUsers = await User.findAll({
+        where: {
+          isActive: true,
+          [Op.or]: [
+            { firstName: { [Op.like]: `%${search}%` } },
+            { lastName: { [Op.like]: `%${search}%` } },
+            { email: { [Op.like]: `%${search}%` } },
+            Sequelize.where(
+              Sequelize.fn(
+                "CONCAT",
+                Sequelize.col("lastName"),
+                " ",
+                Sequelize.col("firstName"),
+              ),
+              { [Op.like]: `%${search}%` },
+            ),
+            Sequelize.where(
+              Sequelize.fn(
+                "CONCAT",
+                Sequelize.col("firstName"),
+                " ",
+                Sequelize.col("lastName"),
+              ),
+              { [Op.like]: `%${search}%` },
+            ),
+          ],
+        },
+        attributes: ["id"],
+      });
+      matchedUserIds = matchedUsers.map((u) => u.id);
+
+      // Tìm specialtyId khớp tên chuyên khoa
+      const matchedSpecialties = await Specialty.findAll({
+        where: { name: { [Op.like]: `%${search}%` } },
+        attributes: ["id"],
+      });
+      matchedSpecialtyIds = matchedSpecialties.map((s) => s.id);
+
+      // Tìm clinicId khớp tên bệnh viện
+      const matchedClinics = await Clinic.findAll({
+        where: {
+          [Op.or]: [
+            { name: { [Op.like]: `%${search}%` } },
+            { address: { [Op.like]: `%${search}%` } },
+          ],
+        },
+        attributes: ["id"],
+      });
+      matchedClinicIds = matchedClinics.map((c) => c.id);
+    }
+
+    // Build doctorWhere
+    const doctorWhere = {};
+    if (specialtyId) doctorWhere.specialtyId = parseInt(specialtyId);
+
+    if (search) {
+      const orConditions = [
+        { nameClinic: { [Op.like]: `%${search}%` } },
+        { addressClinic: { [Op.like]: `%${search}%` } },
       ];
+      if (matchedUserIds.length > 0) {
+        orConditions.push({ userId: { [Op.in]: matchedUserIds } });
+      }
+      if (matchedSpecialtyIds.length > 0) {
+        orConditions.push({ specialtyId: { [Op.in]: matchedSpecialtyIds } });
+      }
+      if (matchedClinicIds.length > 0) {
+        orConditions.push({ clinicId: { [Op.in]: matchedClinicIds } });
+      }
+      doctorWhere[Op.or] = orConditions;
     }
 
     const { count, rows } = await Doctor.findAndCountAll({
@@ -29,8 +98,9 @@ const getAllDoctors = async (req, res) => {
         {
           model: User,
           as: "userData",
-          where: userWhere,
           attributes: { exclude: ["password"] },
+          where: { isActive: true },
+          required: true,
           include: [
             {
               model: Allcode,
@@ -44,6 +114,12 @@ const getAllDoctors = async (req, res) => {
           model: Specialty,
           as: "specialtyData",
           attributes: ["id", "name"],
+          required: false,
+        },
+        {
+          model: Clinic,
+          as: "clinicData",
+          attributes: ["id", "name", "address"],
           required: false,
         },
         {
