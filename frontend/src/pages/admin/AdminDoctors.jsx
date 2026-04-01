@@ -19,6 +19,7 @@ const AdminDoctors = () => {
   const [loading, setLoading] = useState(true);
   const [page, setPage] = useState(1);
   const [showModal, setShowModal] = useState(false);
+  const [editDoctor, setEditDoctor] = useState(null);
   const [specialties, setSpecialties] = useState([]);
   const [clinics, setClinics] = useState([]);
   const [prices, setPrices] = useState([]);
@@ -70,6 +71,47 @@ const AdminDoctors = () => {
       setAllUsers(users.data || []);
     });
   }, [fetchDoctors]);
+  const openEdit = (d) => {
+    setEditDoctor(d);
+    setForm({
+      userId: d.userId,
+      specialtyId: d.specialtyId || "",
+      clinicId: d.clinicId || "",
+      priceId: d.priceId || "",
+      paymentId: d.paymentId || "",
+      provinceId: d.provinceId || "",
+      positionId: d.userData?.positionId || "",
+      nameClinic: d.nameClinic || "",
+      addressClinic: d.addressClinic || "",
+      description: d.description || "",
+      contentHTML: d.contentHTML || "",
+      note: d.note || "",
+    });
+    setShowModal(true);
+  };
+
+  const handleDelete = async (d) => {
+    if (
+      !window.confirm(
+        `Xác nhận xóa hồ sơ bác sĩ ${d.userData?.lastName} ${d.userData?.firstName}?`,
+      )
+    )
+      return;
+    try {
+      await userAPI.update(
+        d.userId,
+        (() => {
+          const fd = new FormData();
+          fd.append("role", "patient");
+          return fd;
+        })(),
+      );
+      toast.success("Đã xóa hồ sơ bác sĩ!");
+      fetchDoctors();
+    } catch {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
 
@@ -78,8 +120,11 @@ const AdminDoctors = () => {
     if (!form.userId) return toast.error("Vui lòng chọn người dùng");
     try {
       await doctorAPI.upsertInfo(form);
-      toast.success("Lưu thông tin bác sĩ thành công!");
+      toast.success(
+        editDoctor ? "Cập nhật thành công!" : "Thêm bác sĩ thành công!",
+      );
       setShowModal(false);
+      setEditDoctor(null);
       fetchDoctors();
     } catch {
       toast.error("Có lỗi xảy ra!");
@@ -152,6 +197,7 @@ const AdminDoctors = () => {
         <button
           className="btn btn-primary btn-sm"
           onClick={() => {
+            setEditDoctor(null);
             setForm({
               userId: "",
               specialtyId: "",
@@ -183,6 +229,7 @@ const AdminDoctors = () => {
                 <th>Cơ sở</th>
                 <th>Giá khám</th>
                 <th>Lịch khám</th>
+                <th>Thao tác</th>
               </tr>
             </thead>
             <tbody>
@@ -273,6 +320,22 @@ const AdminDoctors = () => {
                         📅 Tạo lịch
                       </button>
                     </td>
+                    <td>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => openEdit(d)}
+                        >
+                          ✏️ Sửa
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDelete(d)}
+                        >
+                          🗑️ Xóa
+                        </button>
+                      </div>
+                    </td>
                   </tr>
                 ))
               )}
@@ -316,7 +379,9 @@ const AdminDoctors = () => {
         >
           <div className="modal-box" style={{ maxWidth: 680 }}>
             <div className="modal-header">
-              <h3>Hồ sơ bác sĩ</h3>
+              <h3>
+                {editDoctor ? "✏️ Sửa hồ sơ bác sĩ" : "➕ Thêm hồ sơ bác sĩ"}
+              </h3>
               <button
                 className="modal-close"
                 onClick={() => setShowModal(false)}
@@ -339,6 +404,7 @@ const AdminDoctors = () => {
                   value={form.userId}
                   onChange={set("userId")}
                   required
+                  disabled={!!editDoctor}
                 >
                   <option value="">-- Chọn người dùng --</option>
                   {allUsers.map((u) => (
