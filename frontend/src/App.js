@@ -22,6 +22,8 @@ import DoctorDashboard from "./pages/DoctorDashboard";
 import Profile from "./pages/Profile";
 import ConsultantDashboard from "./pages/ConsultantDashboard";
 import MedicalResultForm from "./pages/MedicalResultForm";
+import MyMedicalResults from "./pages/MyMedicalResults";
+import MedicalResultView from "./pages/MedicalResultView";
 
 const Layout = ({ children }) => (
   <>
@@ -136,6 +138,22 @@ function App() {
             element={
               <Layout>
                 <MedicalResultForm />
+              </Layout>
+            }
+          />
+          <Route
+            path="/my-results"
+            element={
+              <Layout>
+                <MyMedicalResults />
+              </Layout>
+            }
+          />
+          <Route
+            path="/medical-result-view/:id"
+            element={
+              <Layout>
+                <MedicalResultView />
               </Layout>
             }
           />

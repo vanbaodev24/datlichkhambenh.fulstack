@@ -100,5 +100,29 @@ const getMyResults = async (req, res) => {
     return res.status(500).json({ errCode: -1, message: err.message });
   }
 };
+const getById = async (req, res) => {
+  try {
+    const result = await MedicalResult.findByPk(req.params.id, {
+      include: [
+        {
+          model: Doctor,
+          as: "doctorData",
+          include: [
+            {
+              model: User,
+              as: "userData",
+              attributes: ["firstName", "lastName"],
+            },
+          ],
+        },
+      ],
+    });
+    if (!result)
+      return res.status(404).json({ errCode: 1, message: "Not found" });
+    return res.json({ errCode: 0, data: result });
+  } catch (err) {
+    return res.status(500).json({ errCode: -1, message: err.message });
+  }
+};
 
-module.exports = { createResult, getResultByBooking, getMyResults };
+module.exports = { createResult, getResultByBooking, getMyResults, getById };

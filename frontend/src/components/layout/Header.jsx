@@ -85,6 +85,11 @@ const Header = () => {
                   <Link to="/my-bookings" className="drop-item">
                     📅 Lịch hẹn
                   </Link>
+                  {user.role === "patient" && (
+                    <Link to="/my-results" className="drop-item">
+                      📋 Kết quả khám
+                    </Link>
+                  )}
                   <button
                     onClick={handleLogout}
                     className="drop-item drop-logout"

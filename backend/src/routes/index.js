@@ -136,4 +136,5 @@ router.get(
   medicalResultCtrl.getResultByBooking,
 );
 router.get("/medical-results/my", verifyToken, medicalResultCtrl.getMyResults);
+router.get("/medical-results/:id", verifyToken, medicalResultCtrl.getById);
 module.exports = router;
