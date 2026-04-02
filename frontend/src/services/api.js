@@ -86,5 +86,9 @@ export const userAPI = {
 export const allcodeAPI = {
   getByType: (type) => api.get("/allcodes", { params: { type } }),
 };
-
+export const medicalResultAPI = {
+  create: (data) => api.post("/medical-results", data),
+  getByBooking: (bookingId) => api.get(`/medical-results/booking/${bookingId}`),
+  getMyResults: () => api.get("/medical-results/my"),
+};
 export default api;

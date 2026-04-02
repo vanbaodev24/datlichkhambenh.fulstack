@@ -20,6 +20,8 @@ import Admin from "./pages/Admin";
 import { Login, Register } from "./pages/Auth";
 import DoctorDashboard from "./pages/DoctorDashboard";
 import Profile from "./pages/Profile";
+import ConsultantDashboard from "./pages/ConsultantDashboard";
+import MedicalResultForm from "./pages/MedicalResultForm";
 
 const Layout = ({ children }) => (
   <>
@@ -114,10 +116,26 @@ function App() {
             }
           />
           <Route
+            path="/consultant-dashboard"
+            element={
+              <Layout>
+                <ConsultantDashboard />
+              </Layout>
+            }
+          />
+          <Route
             path="/profile"
             element={
               <Layout>
                 <Profile />
+              </Layout>
+            }
+          />
+          <Route
+            path="/medical-result/:bookingId"
+            element={
+              <Layout>
+                <MedicalResultForm />
               </Layout>
             }
           />

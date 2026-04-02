@@ -1,0 +1,59 @@
+.mrf-page {
+  background: var(--bg-light);
+  min-height: calc(100vh - 68px);
+}
+.mrf-header {
+  background: linear-gradient(135deg, #0d2137, #1a3a52);
+  padding: 24px 0;
+}
+.mrf-header h1 {
+  color: #fff;
+  font-size: 1.4rem;
+  font-weight: 800;
+}
+.mrf-section {
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.mrf-section h2 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--primary);
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid var(--primary-light);
+}
+.mrf-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+.mrf-table th {
+  background: var(--primary);
+  color: #fff;
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.82rem;
+}
+.mrf-table td {
+  padding: 8px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.mrf-table tr:hover td {
+  background: var(--bg-light);
+}
+.mrf-total {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 0 0;
+  border-top: 2px solid var(--border);
+  font-size: 1.1rem;
+}
+.mrf-total strong {
+  font-size: 1.4rem;
+  color: var(--primary);
+  font-weight: 800;
+}

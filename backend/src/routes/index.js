@@ -2,7 +2,12 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
-const { verifyToken, isAdmin, isDoctor } = require("../middleware/auth");
+const {
+  verifyToken,
+  isAdmin,
+  isDoctor,
+  isConsultant,
+} = require("../middleware/auth");
 
 // Multer config
 const storage = multer.diskStorage({
@@ -18,7 +23,7 @@ const userCtrl = require("../controllers/userController");
 const doctorCtrl = require("../controllers/doctorController");
 const bookingCtrl = require("../controllers/bookingController");
 const spClinicCtrl = require("../controllers/specialtyClinicController");
-
+const medicalResultCtrl = require("../controllers/medicalResultController");
 // === AUTH ===
 router.post("/auth/register", authCtrl.register);
 router.post("/auth/login", authCtrl.login);
@@ -118,5 +123,17 @@ router.put(
   spClinicCtrl.updateClinic,
 );
 router.delete("/clinics/:id", verifyToken, isAdmin, spClinicCtrl.deleteClinic);
-
+// === MEDICAL RESULTS ===
+router.post(
+  "/medical-results",
+  verifyToken,
+  isDoctor,
+  medicalResultCtrl.createResult,
+);
+router.get(
+  "/medical-results/booking/:bookingId",
+  verifyToken,
+  medicalResultCtrl.getResultByBooking,
+);
+router.get("/medical-results/my", verifyToken, medicalResultCtrl.getMyResults);
 module.exports = router;

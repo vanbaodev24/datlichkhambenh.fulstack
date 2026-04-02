@@ -158,6 +158,12 @@ const seedData = async () => {
       valueVi: "Bệnh nhân",
       valueEn: "Patient",
     },
+    {
+      keyMap: "ROLE_CONSULTANT",
+      type: "ROLE",
+      valueVi: "Tư vấn viên",
+      valueEn: "Consultant",
+    },
   ];
 
   for (const code of allcodes) {

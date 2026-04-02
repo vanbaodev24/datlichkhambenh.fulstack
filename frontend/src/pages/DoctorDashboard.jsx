@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import moment from "moment";
 import { bookingAPI } from "../services/api";
@@ -327,6 +327,13 @@ const DoctorDashboard = () => {
                     minWidth: 160,
                   }}
                 >
+                  <Link
+                    to={`/medical-result/${b.id}`}
+                    className="btn btn-outline btn-sm"
+                    style={{ textAlign: "center" }}
+                  >
+                    📋 Nhập KQ
+                  </Link>
                   <select
                     className="form-control"
                     style={{ fontSize: "0.82rem", padding: "6px 10px" }}

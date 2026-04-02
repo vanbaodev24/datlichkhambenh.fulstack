@@ -5,6 +5,7 @@ import { userAPI } from "../../services/api";
 const ROLES = {
   admin: "👑 Admin",
   doctor: "👨‍⚕️ Bác sĩ",
+  consultant: "💼 Tư vấn viên",
   patient: "👤 Bệnh nhân",
 };
 
@@ -150,6 +151,7 @@ const AdminUsers = () => {
           <option value="">Tất cả vai trò</option>
           <option value="admin">Admin</option>
           <option value="doctor">Bác sĩ</option>
+          <option value="consultant">Tư vấn viên</option>
           <option value="patient">Bệnh nhân</option>
         </select>
       </div>
@@ -232,7 +234,7 @@ const AdminUsers = () => {
                     <td style={{ fontSize: "0.88rem" }}>{u.phone || "—"}</td>
                     <td>
                       <span
-                        className={`badge badge-${u.role === "admin" ? "danger" : u.role === "doctor" ? "primary" : "secondary"}`}
+                        className={`badge badge-${u.role === "admin" ? "danger" : u.role === "doctor" ? "primary" : u.role === "consultant" ? "warning" : "secondary"}`}
                       >
                         {ROLES[u.role]}
                       </span>
@@ -365,6 +367,7 @@ const AdminUsers = () => {
                     onChange={set("role")}
                   >
                     <option value="patient">Bệnh nhân</option>
+                    <option value="consultant">Tư vấn viên</option>
                     <option value="doctor">Bác sĩ</option>
                     <option value="admin">Admin</option>
                   </select>
