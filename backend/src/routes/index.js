@@ -24,6 +24,7 @@ const doctorCtrl = require("../controllers/doctorController");
 const bookingCtrl = require("../controllers/bookingController");
 const spClinicCtrl = require("../controllers/specialtyClinicController");
 const medicalResultCtrl = require("../controllers/medicalResultController");
+const patientCtrl = require("../controllers/patientController");
 // === AUTH ===
 router.post("/auth/register", authCtrl.register);
 router.post("/auth/login", authCtrl.login);
@@ -137,4 +138,24 @@ router.get(
 );
 router.get("/medical-results/my", verifyToken, medicalResultCtrl.getMyResults);
 router.get("/medical-results/:id", verifyToken, medicalResultCtrl.getById);
+
+// === PATIENT PROFILE ===
+router.get("/patient/profile", verifyToken, patientCtrl.getFullProfile);
+router.put("/patient/profile", verifyToken, patientCtrl.updateProfile);
+router.get(
+  "/patient/medical-history",
+  verifyToken,
+  patientCtrl.getMedicalHistory,
+);
+router.post(
+  "/patient/medical-history",
+  verifyToken,
+  patientCtrl.addMedicalHistory,
+);
+router.delete(
+  "/patient/medical-history/:id",
+  verifyToken,
+  patientCtrl.deleteMedicalHistory,
+);
+
 module.exports = router;

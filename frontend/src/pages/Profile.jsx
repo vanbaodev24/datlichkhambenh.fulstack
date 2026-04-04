@@ -1,12 +1,10 @@
-import React, { useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import { toast } from "react-toastify";
-import { userAPI } from "../services/api";
-import { login } from "../redux/slices/authSlice";
+import { userAPI, patientAPI } from "../services/api";
 
 const Profile = () => {
   const { user } = useSelector((s) => s.auth);
-  const dispatch = useDispatch();
 
   const [form, setForm] = useState({
     firstName: user?.firstName || "",
@@ -15,14 +13,38 @@ const Profile = () => {
     address: user?.address || "",
     gender: user?.gender || "M",
     dob: user?.dob || "",
+    bhytCode: user?.bhytCode || "",
+    occupation: user?.occupation || "",
+    ethnicity: user?.ethnicity || "",
+    nationality: user?.nationality || "Việt Nam",
   });
+
+  const [histories, setHistories] = useState([]);
+  const [historyForm, setHistoryForm] = useState({
+    disease: "",
+    symptoms: "",
+    since: "",
+    treatment: "",
+    allergies: "",
+    note: "",
+  });
+  const [showHistoryForm, setShowHistoryForm] = useState(false);
   const [passwordForm, setPasswordForm] = useState({
-    currentPassword: "",
     newPassword: "",
     confirmPassword: "",
   });
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState("info");
+
+  // Load tiền sử bệnh khi chuyển sang tab medical
+  useEffect(() => {
+    if (activeTab === "medical") {
+      patientAPI
+        .getMedicalHistory()
+        .then((r) => setHistories(r.data || []))
+        .catch(() => setHistories([]));
+    }
+  }, [activeTab]);
 
   const set = (k) => (e) => setForm((f) => ({ ...f, [k]: e.target.value }));
   const setPass = (k) => (e) =>
@@ -32,16 +54,10 @@ const Profile = () => {
     e.preventDefault();
     setLoading(true);
     try {
-      const fd = new FormData();
-      Object.entries(form).forEach(([k, v]) => {
-        if (v) fd.append(k, v);
-      });
-      await userAPI.update(user.id, fd);
+      await patientAPI.updateProfile(form);
       toast.success("Cập nhật thông tin thành công!");
-      // Update local user
       const stored = JSON.parse(localStorage.getItem("user") || "{}");
-      const updated = { ...stored, ...form };
-      localStorage.setItem("user", JSON.stringify(updated));
+      localStorage.setItem("user", JSON.stringify({ ...stored, ...form }));
     } catch {
       toast.error("Có lỗi xảy ra!");
     }
@@ -64,19 +80,47 @@ const Profile = () => {
       fd.append("password", passwordForm.newPassword);
       await userAPI.update(user.id, fd);
       toast.success("Đổi mật khẩu thành công!");
-      setPasswordForm({
-        currentPassword: "",
-        newPassword: "",
-        confirmPassword: "",
-      });
+      setPasswordForm({ newPassword: "", confirmPassword: "" });
     } catch {
       toast.error("Có lỗi xảy ra!");
     }
     setLoading(false);
   };
 
+  const handleAddHistory = async () => {
+    if (!historyForm.disease) return toast.error("Vui lòng nhập tên bệnh!");
+    try {
+      await patientAPI.addMedicalHistory(historyForm);
+      toast.success("Thêm tiền sử bệnh thành công!");
+      setHistoryForm({
+        disease: "",
+        symptoms: "",
+        since: "",
+        treatment: "",
+        allergies: "",
+        note: "",
+      });
+      setShowHistoryForm(false);
+      patientAPI.getMedicalHistory().then((r) => setHistories(r.data || []));
+    } catch {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
+  const handleDeleteHistory = async (id) => {
+    if (!window.confirm("Xóa tiền sử này?")) return;
+    try {
+      await patientAPI.deleteMedicalHistory(id);
+      toast.success("Đã xóa!");
+      setHistories((prev) => prev.filter((x) => x.id !== id));
+    } catch {
+      toast.error("Có lỗi xảy ra!");
+    }
+  };
+
   const tabs = [
     { key: "info", label: "👤 Thông tin cá nhân" },
+    { key: "medical", label: "🏥 Tiền sử bệnh" },
     { key: "password", label: "🔒 Đổi mật khẩu" },
   ];
 
@@ -145,7 +189,9 @@ const Profile = () => {
                 ? "👑 Admin"
                 : user?.role === "doctor"
                   ? "🩺 Bác sĩ"
-                  : "👤 Bệnh nhân"}
+                  : user?.role === "consultant"
+                    ? "💼 Tư vấn viên"
+                    : "👤 Bệnh nhân"}
             </span>
           </div>
         </div>
@@ -193,6 +239,7 @@ const Profile = () => {
 
           {/* Content */}
           <div className="card" style={{ padding: 28 }}>
+            {/* TAB: THÔNG TIN CÁ NHÂN */}
             {activeTab === "info" && (
               <>
                 <h2
@@ -256,6 +303,42 @@ const Profile = () => {
                         onChange={set("dob")}
                       />
                     </div>
+                    <div className="form-group">
+                      <label className="form-label">Nghề nghiệp</label>
+                      <input
+                        className="form-control"
+                        value={form.occupation}
+                        onChange={set("occupation")}
+                        placeholder="VD: Kỹ sư, Giáo viên..."
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Mã thẻ BHYT</label>
+                      <input
+                        className="form-control"
+                        value={form.bhytCode}
+                        onChange={set("bhytCode")}
+                        placeholder="VD: HS4030085xxxxxxxx"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Dân tộc</label>
+                      <input
+                        className="form-control"
+                        value={form.ethnicity}
+                        onChange={set("ethnicity")}
+                        placeholder="VD: Kinh"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Quốc tịch</label>
+                      <input
+                        className="form-control"
+                        value={form.nationality}
+                        onChange={set("nationality")}
+                        placeholder="Việt Nam"
+                      />
+                    </div>
                   </div>
                   <div className="form-group">
                     <label className="form-label">Địa chỉ</label>
@@ -279,6 +362,274 @@ const Profile = () => {
               </>
             )}
 
+            {/* TAB: TIỀN SỬ BỆNH */}
+            {activeTab === "medical" && (
+              <>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "space-between",
+                    marginBottom: 20,
+                    paddingBottom: 14,
+                    borderBottom: "1px solid var(--border)",
+                  }}
+                >
+                  <h2 style={{ fontSize: "1.1rem", fontWeight: 700 }}>
+                    🏥 Tiền sử bệnh
+                  </h2>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    onClick={() => setShowHistoryForm(!showHistoryForm)}
+                  >
+                    {showHistoryForm ? "✕ Đóng" : "+ Thêm tiền sử"}
+                  </button>
+                </div>
+
+                {showHistoryForm && (
+                  <div
+                    style={{
+                      background: "var(--bg-light)",
+                      borderRadius: 10,
+                      padding: 20,
+                      marginBottom: 20,
+                      border: "1px solid var(--border)",
+                    }}
+                  >
+                    <h4
+                      style={{
+                        marginBottom: 16,
+                        fontSize: "0.95rem",
+                        fontWeight: 700,
+                      }}
+                    >
+                      Thêm tiền sử bệnh mới
+                    </h4>
+                    <div className="grid-2">
+                      <div className="form-group">
+                        <label className="form-label">Tên bệnh *</label>
+                        <input
+                          className="form-control"
+                          value={historyForm.disease}
+                          onChange={(e) =>
+                            setHistoryForm((f) => ({
+                              ...f,
+                              disease: e.target.value,
+                            }))
+                          }
+                          placeholder="VD: Tiểu đường, Huyết áp..."
+                        />
+                      </div>
+                      <div className="form-group">
+                        <label className="form-label">Từ ngày</label>
+                        <input
+                          type="date"
+                          className="form-control"
+                          value={historyForm.since}
+                          onChange={(e) =>
+                            setHistoryForm((f) => ({
+                              ...f,
+                              since: e.target.value,
+                            }))
+                          }
+                        />
+                      </div>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Triệu chứng</label>
+                      <textarea
+                        className="form-control"
+                        rows={2}
+                        value={historyForm.symptoms}
+                        onChange={(e) =>
+                          setHistoryForm((f) => ({
+                            ...f,
+                            symptoms: e.target.value,
+                          }))
+                        }
+                        placeholder="Mô tả triệu chứng..."
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Đang điều trị bằng</label>
+                      <input
+                        className="form-control"
+                        value={historyForm.treatment}
+                        onChange={(e) =>
+                          setHistoryForm((f) => ({
+                            ...f,
+                            treatment: e.target.value,
+                          }))
+                        }
+                        placeholder="Thuốc, phương pháp điều trị..."
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Dị ứng</label>
+                      <input
+                        className="form-control"
+                        value={historyForm.allergies}
+                        onChange={(e) =>
+                          setHistoryForm((f) => ({
+                            ...f,
+                            allergies: e.target.value,
+                          }))
+                        }
+                        placeholder="Dị ứng thuốc, thức ăn..."
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Ghi chú</label>
+                      <textarea
+                        className="form-control"
+                        rows={2}
+                        value={historyForm.note}
+                        onChange={(e) =>
+                          setHistoryForm((f) => ({
+                            ...f,
+                            note: e.target.value,
+                          }))
+                        }
+                      />
+                    </div>
+                    <div style={{ display: "flex", gap: 10 }}>
+                      <button
+                        className="btn btn-primary"
+                        onClick={handleAddHistory}
+                      >
+                        💾 Lưu
+                      </button>
+                      <button
+                        className="btn btn-outline"
+                        onClick={() => setShowHistoryForm(false)}
+                      >
+                        Hủy
+                      </button>
+                    </div>
+                  </div>
+                )}
+
+                {histories.length === 0 ? (
+                  <div
+                    style={{
+                      textAlign: "center",
+                      padding: "40px 20px",
+                      color: "var(--text-medium)",
+                    }}
+                  >
+                    <div style={{ fontSize: "3rem", marginBottom: 12 }}>🏥</div>
+                    <p>Chưa có tiền sử bệnh nào được ghi nhận</p>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: 12,
+                    }}
+                  >
+                    {histories.map((h) => (
+                      <div
+                        key={h.id}
+                        style={{
+                          background: "var(--bg-light)",
+                          borderRadius: 10,
+                          padding: "16px 18px",
+                          border: "1px solid var(--border)",
+                        }}
+                      >
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            marginBottom: 8,
+                          }}
+                        >
+                          <strong
+                            style={{
+                              color: "var(--primary)",
+                              fontSize: "0.95rem",
+                            }}
+                          >
+                            🦠 {h.disease}
+                          </strong>
+                          <div
+                            style={{
+                              display: "flex",
+                              gap: 8,
+                              alignItems: "center",
+                            }}
+                          >
+                            {h.since && (
+                              <span
+                                style={{
+                                  fontSize: "0.78rem",
+                                  color: "var(--text-medium)",
+                                }}
+                              >
+                                Từ: {h.since}
+                              </span>
+                            )}
+                            <button
+                              className="btn btn-danger btn-sm"
+                              onClick={() => handleDeleteHistory(h.id)}
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                        {h.symptoms && (
+                          <p
+                            style={{
+                              fontSize: "0.85rem",
+                              color: "var(--text-medium)",
+                              marginBottom: 4,
+                            }}
+                          >
+                            📋 Triệu chứng: {h.symptoms}
+                          </p>
+                        )}
+                        {h.treatment && (
+                          <p
+                            style={{
+                              fontSize: "0.85rem",
+                              color: "var(--text-medium)",
+                              marginBottom: 4,
+                            }}
+                          >
+                            💊 Điều trị: {h.treatment}
+                          </p>
+                        )}
+                        {h.allergies && (
+                          <p
+                            style={{
+                              fontSize: "0.85rem",
+                              color: "#e74c3c",
+                              marginBottom: 4,
+                            }}
+                          >
+                            ⚠️ Dị ứng: {h.allergies}
+                          </p>
+                        )}
+                        {h.note && (
+                          <p
+                            style={{
+                              fontSize: "0.82rem",
+                              color: "var(--text-light)",
+                            }}
+                          >
+                            📝 {h.note}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+
+            {/* TAB: ĐỔI MẬT KHẨU */}
             {activeTab === "password" && (
               <>
                 <h2

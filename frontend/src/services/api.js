@@ -86,6 +86,13 @@ export const userAPI = {
 export const allcodeAPI = {
   getByType: (type) => api.get("/allcodes", { params: { type } }),
 };
+export const patientAPI = {
+  getProfile: () => api.get("/patient/profile"),
+  updateProfile: (data) => api.put("/patient/profile", data),
+  getMedicalHistory: () => api.get("/patient/medical-history"),
+  addMedicalHistory: (data) => api.post("/patient/medical-history", data),
+  deleteMedicalHistory: (id) => api.delete(`/patient/medical-history/${id}`),
+};
 export const medicalResultAPI = {
   create: (data) => api.post("/medical-results", data),
   getByBooking: (bookingId) => api.get(`/medical-results/booking/${bookingId}`),

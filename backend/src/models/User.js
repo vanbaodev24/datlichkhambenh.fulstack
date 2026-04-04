@@ -19,8 +19,13 @@ const User = sequelize.define(
       defaultValue: "patient",
     },
     isActive: { type: DataTypes.BOOLEAN, defaultValue: true },
-    positionId: { type: DataTypes.STRING(50) }, // GS, PGS, BS, ThS
+    positionId: { type: DataTypes.STRING(50) },
+    bhytCode: { type: DataTypes.STRING(20) }, // Mã thẻ BHYT
+    occupation: { type: DataTypes.STRING(100) }, // Nghề nghiệp
+    ethnicity: { type: DataTypes.STRING(50) }, // Dân tộc
+    nationality: { type: DataTypes.STRING(50) }, // Quốc tịch
   },
+  {},
   {
     tableName: "users",
     timestamps: true,
