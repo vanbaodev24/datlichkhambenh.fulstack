@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import moment from "moment";
-import { bookingAPI } from "../services/api";
+import { bookingAPI, examinationAPI } from "../services/api";
 
 const statusColors = {
   S1: "warning",
@@ -13,6 +13,8 @@ const statusColors = {
 
 const MyBookings = () => {
   const [bookings, setBookings] = useState([]);
+  const [examinations, setExaminations] = useState([]);
+  const [activeTab, setActiveTab] = useState("bookings");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,6 +25,12 @@ const MyBookings = () => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+  }, []);
+  useEffect(() => {
+    examinationAPI
+      .getPatient()
+      .then((r) => setExaminations(r.data || []))
+      .catch(() => setExaminations([]));
   }, []);
 
   return (

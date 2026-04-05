@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import moment from "moment";
-import { bookingAPI } from "../services/api";
+import { bookingAPI, examinationAPI } from "../services/api";
 
 const STATUS = {
   S1: { label: "Mới đặt", color: "#f39c12" },
@@ -21,6 +21,23 @@ const DoctorDashboard = () => {
     moment().format("YYYY-MM-DD"),
   );
   const [filterStatus, setFilterStatus] = useState("");
+  const [showExamModal, setShowExamModal] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState(null);
+  const [examForm, setExamForm] = useState({
+    chiefComplaint: "",
+    clinicalExam: "",
+    diagnosis: "",
+    treatmentPlan: "",
+    followUpDate: "",
+    bloodPressure: "",
+    heartRate: "",
+    temperature: "",
+    weight: "",
+    height: "",
+    status: "done",
+    note: "",
+  });
+  const [examLoading, setExamLoading] = useState(false);
 
   useEffect(() => {
     if (!user || user.role !== "doctor") {
@@ -39,6 +56,62 @@ const DoctorDashboard = () => {
       .finally(() => setLoading(false));
   };
 
+  const handleOpenExam = async (booking) => {
+    setSelectedBooking(booking);
+    try {
+      const r = await examinationAPI.getByBooking(booking.id);
+      if (r.data) {
+        setExamForm({
+          chiefComplaint: r.data.chiefComplaint || "",
+          clinicalExam: r.data.clinicalExam || "",
+          diagnosis: r.data.diagnosis || "",
+          treatmentPlan: r.data.treatmentPlan || "",
+          followUpDate: r.data.followUpDate || "",
+          bloodPressure: r.data.bloodPressure || "",
+          heartRate: r.data.heartRate || "",
+          temperature: r.data.temperature || "",
+          weight: r.data.weight || "",
+          height: r.data.height || "",
+          status: r.data.status || "done",
+          note: r.data.note || "",
+        });
+      } else {
+        setExamForm({
+          chiefComplaint: "",
+          clinicalExam: "",
+          diagnosis: "",
+          treatmentPlan: "",
+          followUpDate: "",
+          bloodPressure: "",
+          heartRate: "",
+          temperature: "",
+          weight: "",
+          height: "",
+          status: "done",
+          note: "",
+        });
+      }
+    } catch {}
+    setShowExamModal(true);
+  };
+
+  const handleSaveExam = async (e) => {
+    e.preventDefault();
+    setExamLoading(true);
+    try {
+      await examinationAPI.upsert({
+        bookingId: selectedBooking.id,
+        ...examForm,
+      });
+      toast.success("Lưu phiếu khám thành công!");
+      setShowExamModal(false);
+      fetchBookings();
+    } catch {
+      toast.error("Có lỗi xảy ra!");
+    }
+    setExamLoading(false);
+  };
+
   const handleUpdateStatus = async (id, statusId) => {
     try {
       await bookingAPI.updateStatus(id, statusId);
@@ -52,7 +125,6 @@ const DoctorDashboard = () => {
   const filtered = filterStatus
     ? bookings.filter((b) => b.statusId === filterStatus)
     : bookings;
-
   const stats = {
     total: bookings.length,
     new: bookings.filter((b) => b.statusId === "S1").length,
@@ -334,6 +406,13 @@ const DoctorDashboard = () => {
                   >
                     📋 Nhập KQ
                   </Link>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ textAlign: "center" }}
+                    onClick={() => handleOpenExam(b)}
+                  >
+                    📝 Phiếu khám
+                  </button>
                   <select
                     className="form-control"
                     style={{ fontSize: "0.82rem", padding: "6px 10px" }}
@@ -352,6 +431,242 @@ const DoctorDashboard = () => {
           </div>
         )}
       </div>
+
+      {/* Modal phiếu khám */}
+      {showExamModal && selectedBooking && (
+        <div
+          className="modal-overlay"
+          onClick={(e) =>
+            e.target === e.currentTarget && setShowExamModal(false)
+          }
+        >
+          <div className="modal-box" style={{ maxWidth: 640 }}>
+            <div className="modal-header">
+              <h3>📝 Phiếu khám — {selectedBooking.patientName}</h3>
+              <button
+                className="modal-close"
+                onClick={() => setShowExamModal(false)}
+              >
+                ✕
+              </button>
+            </div>
+            <form
+              onSubmit={handleSaveExam}
+              style={{
+                padding: "20px 24px",
+                maxHeight: "70vh",
+                overflowY: "auto",
+              }}
+            >
+              {/* Chỉ số sinh tồn */}
+              <h4
+                style={{
+                  marginBottom: 14,
+                  fontSize: "0.9rem",
+                  fontWeight: 700,
+                  color: "var(--primary)",
+                }}
+              >
+                💓 Chỉ số sinh tồn
+              </h4>
+              <div className="grid-2">
+                <div className="form-group">
+                  <label className="form-label">Huyết áp (mmHg)</label>
+                  <input
+                    className="form-control"
+                    value={examForm.bloodPressure}
+                    onChange={(e) =>
+                      setExamForm((f) => ({
+                        ...f,
+                        bloodPressure: e.target.value,
+                      }))
+                    }
+                    placeholder="VD: 120/80"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Nhịp tim (lần/phút)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={examForm.heartRate}
+                    onChange={(e) =>
+                      setExamForm((f) => ({ ...f, heartRate: e.target.value }))
+                    }
+                    placeholder="VD: 72"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Nhiệt độ (°C)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="form-control"
+                    value={examForm.temperature}
+                    onChange={(e) =>
+                      setExamForm((f) => ({
+                        ...f,
+                        temperature: e.target.value,
+                      }))
+                    }
+                    placeholder="VD: 37.0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Cân nặng (kg)</label>
+                  <input
+                    type="number"
+                    step="0.1"
+                    className="form-control"
+                    value={examForm.weight}
+                    onChange={(e) =>
+                      setExamForm((f) => ({ ...f, weight: e.target.value }))
+                    }
+                    placeholder="VD: 65"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Chiều cao (cm)</label>
+                  <input
+                    type="number"
+                    className="form-control"
+                    value={examForm.height}
+                    onChange={(e) =>
+                      setExamForm((f) => ({ ...f, height: e.target.value }))
+                    }
+                    placeholder="VD: 170"
+                  />
+                </div>
+              </div>
+
+              {/* Nội dung khám */}
+              <h4
+                style={{
+                  marginBottom: 14,
+                  marginTop: 8,
+                  fontSize: "0.9rem",
+                  fontWeight: 700,
+                  color: "var(--primary)",
+                }}
+              >
+                🩺 Nội dung khám
+              </h4>
+              <div className="form-group">
+                <label className="form-label">Lý do khám chính</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={examForm.chiefComplaint}
+                  onChange={(e) =>
+                    setExamForm((f) => ({
+                      ...f,
+                      chiefComplaint: e.target.value,
+                    }))
+                  }
+                  placeholder="Bệnh nhân đến khám vì..."
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Khám lâm sàng</label>
+                <textarea
+                  className="form-control"
+                  rows={3}
+                  value={examForm.clinicalExam}
+                  onChange={(e) =>
+                    setExamForm((f) => ({ ...f, clinicalExam: e.target.value }))
+                  }
+                  placeholder="Kết quả khám lâm sàng..."
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Chẩn đoán</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={examForm.diagnosis}
+                  onChange={(e) =>
+                    setExamForm((f) => ({ ...f, diagnosis: e.target.value }))
+                  }
+                  placeholder="Chẩn đoán bệnh..."
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Kế hoạch điều trị</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={examForm.treatmentPlan}
+                  onChange={(e) =>
+                    setExamForm((f) => ({
+                      ...f,
+                      treatmentPlan: e.target.value,
+                    }))
+                  }
+                  placeholder="Phác đồ điều trị, thuốc..."
+                />
+              </div>
+              <div className="grid-2">
+                <div className="form-group">
+                  <label className="form-label">Ngày tái khám</label>
+                  <input
+                    type="date"
+                    className="form-control"
+                    value={examForm.followUpDate}
+                    onChange={(e) =>
+                      setExamForm((f) => ({
+                        ...f,
+                        followUpDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Trạng thái</label>
+                  <select
+                    className="form-control"
+                    value={examForm.status}
+                    onChange={(e) =>
+                      setExamForm((f) => ({ ...f, status: e.target.value }))
+                    }
+                  >
+                    <option value="examining">Đang khám</option>
+                    <option value="done">Đã hoàn thành</option>
+                    <option value="transferred">Chuyển viện</option>
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Ghi chú</label>
+                <textarea
+                  className="form-control"
+                  rows={2}
+                  value={examForm.note}
+                  onChange={(e) =>
+                    setExamForm((f) => ({ ...f, note: e.target.value }))
+                  }
+                />
+              </div>
+
+              <div className="modal-actions">
+                <button
+                  type="button"
+                  className="btn btn-outline"
+                  onClick={() => setShowExamModal(false)}
+                >
+                  Hủy
+                </button>
+                <button
+                  type="submit"
+                  className="btn btn-primary"
+                  disabled={examLoading}
+                >
+                  {examLoading ? "Đang lưu..." : "💾 Lưu phiếu khám"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

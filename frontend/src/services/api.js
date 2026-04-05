@@ -86,6 +86,13 @@ export const userAPI = {
 export const allcodeAPI = {
   getByType: (type) => api.get("/allcodes", { params: { type } }),
 };
+export const examinationAPI = {
+  upsert: (data) => api.post("/examinations", data),
+  getByBooking: (bookingId) => api.get(`/examinations/booking/${bookingId}`),
+  getDoctor: (params) => api.get("/examinations/doctor", { params }),
+  getPatient: () => api.get("/examinations/patient"),
+  getAll: (params) => api.get("/examinations", { params }),
+};
 export const patientAPI = {
   getProfile: () => api.get("/patient/profile"),
   updateProfile: (data) => api.put("/patient/profile", data),

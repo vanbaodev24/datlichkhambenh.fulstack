@@ -1,6 +1,7 @@
 const User = require("./User");
 const MedicalResult = require("./MedicalResult");
 const MedicalHistory = require("./MedicalHistory");
+const ExaminationRecord = require("./ExaminationRecord");
 const Doctor = require("./Doctor");
 const Specialty = require("./Specialty");
 const Clinic = require("./Clinic");
@@ -110,6 +111,31 @@ User.hasMany(MedicalHistory, {
   ...FK,
 });
 
+ExaminationRecord.belongsTo(Booking, {
+  foreignKey: "bookingId",
+  as: "bookingData",
+  ...FK,
+});
+ExaminationRecord.belongsTo(Doctor, {
+  foreignKey: "doctorId",
+  as: "doctorData",
+  ...FK,
+});
+ExaminationRecord.belongsTo(User, {
+  foreignKey: "patientId",
+  as: "patientData",
+  ...FK,
+});
+ExaminationRecord.belongsTo(MedicalResult, {
+  foreignKey: "medicalResultId",
+  as: "medicalResultData",
+  ...FK,
+});
+Booking.hasOne(ExaminationRecord, {
+  foreignKey: "bookingId",
+  as: "examinationRecord",
+  ...FK,
+});
 module.exports = {
   User,
   Doctor,
@@ -120,4 +146,5 @@ module.exports = {
   Allcode,
   MedicalResult,
   MedicalHistory,
+  ExaminationRecord,
 };

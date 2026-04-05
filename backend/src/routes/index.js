@@ -138,6 +138,36 @@ router.get(
 );
 router.get("/medical-results/my", verifyToken, medicalResultCtrl.getMyResults);
 router.get("/medical-results/:id", verifyToken, medicalResultCtrl.getById);
+// === EXAMINATION RECORDS ===
+const examinationCtrl = require("../controllers/examinationController");
+router.post(
+  "/examinations",
+  verifyToken,
+  isDoctor,
+  examinationCtrl.upsertExamination,
+);
+router.get(
+  "/examinations/booking/:bookingId",
+  verifyToken,
+  examinationCtrl.getByBooking,
+);
+router.get(
+  "/examinations/doctor",
+  verifyToken,
+  isDoctor,
+  examinationCtrl.getDoctorExaminations,
+);
+router.get(
+  "/examinations/patient",
+  verifyToken,
+  examinationCtrl.getPatientExaminations,
+);
+router.get(
+  "/examinations",
+  verifyToken,
+  isAdmin,
+  examinationCtrl.getAllExaminations,
+);
 
 // === PATIENT PROFILE ===
 router.get("/patient/profile", verifyToken, patientCtrl.getFullProfile);
