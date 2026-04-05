@@ -169,6 +169,38 @@ router.get(
   examinationCtrl.getAllExaminations,
 );
 
+// === CONSULTATION RECORDS ===
+const consultationCtrl = require("../controllers/consultationController");
+router.post(
+  "/consultations",
+  verifyToken,
+  isConsultant,
+  consultationCtrl.createConsultation,
+);
+router.get(
+  "/consultations/booking/:bookingId",
+  verifyToken,
+  consultationCtrl.getByBooking,
+);
+router.get(
+  "/consultations/my",
+  verifyToken,
+  isConsultant,
+  consultationCtrl.getMyConsultations,
+);
+router.put(
+  "/consultations/:id/status",
+  verifyToken,
+  isConsultant,
+  consultationCtrl.updateStatus,
+);
+router.get(
+  "/consultations",
+  verifyToken,
+  isAdmin,
+  consultationCtrl.getAllConsultations,
+);
+
 // === PATIENT PROFILE ===
 router.get("/patient/profile", verifyToken, patientCtrl.getFullProfile);
 router.put("/patient/profile", verifyToken, patientCtrl.updateProfile);
