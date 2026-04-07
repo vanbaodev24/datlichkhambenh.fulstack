@@ -87,6 +87,22 @@ export const allcodeAPI = {
   getByType: (type) => api.get("/allcodes", { params: { type } }),
 };
 
+export const notificationAPI = {
+  getAll: (params) => api.get("/notifications", { params }),
+  getUnreadCount: () => api.get("/notifications/unread-count"),
+  markAsRead: (id) => api.put(`/notifications/${id}/read`),
+  markAllAsRead: () => api.put("/notifications/read-all"),
+  delete: (id) => api.delete(`/notifications/${id}`),
+};
+
+export const prescriptionAPI = {
+  upsert: (data) => api.post("/prescriptions", data),
+  getByBooking: (bookingId) => api.get(`/prescriptions/booking/${bookingId}`),
+  getById: (id) => api.get(`/prescriptions/${id}`),
+  getPatient: () => api.get("/prescriptions/patient"),
+  getDoctor: (params) => api.get("/prescriptions/doctor", { params }),
+};
+
 export const consultationAPI = {
   create: (data) => api.post("/consultations", data),
   getByBooking: (bookingId) => api.get(`/consultations/booking/${bookingId}`),

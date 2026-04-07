@@ -1,4 +1,5 @@
 const { MedicalResult, Booking, Doctor, User, Allcode } = require("../models");
+const { notify } = require("../utils/notificationHelper");
 
 const createResult = async (req, res) => {
   try {
@@ -61,6 +62,21 @@ const createResult = async (req, res) => {
     });
 
     await Booking.update({ statusId: "S3" }, { where: { id: bookingId } });
+
+    // Thông báo cho bệnh nhân
+    try {
+      const doctor = await Doctor.findByPk(result.doctorId, {
+        include: [{ model: User, as: "userData" }],
+      });
+      const doctorName = doctor?.userData
+        ? `${doctor.userData.lastName} ${doctor.userData.firstName}`
+        : "Bác sĩ";
+      const bk = await Booking.findByPk(bookingId);
+      if (bk?.patientId)
+        await notify.resultReady(bk.patientId, doctorName, result.id);
+    } catch (e) {
+      console.error("Notify error:", e.message);
+    }
 
     return res
       .status(201)

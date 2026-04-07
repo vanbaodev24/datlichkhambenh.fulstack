@@ -24,6 +24,10 @@ import ConsultantDashboard from "./pages/ConsultantDashboard";
 import MedicalResultForm from "./pages/MedicalResultForm";
 import MyMedicalResults from "./pages/MyMedicalResults";
 import MedicalResultView from "./pages/MedicalResultView";
+import PrescriptionForm from "./pages/PrescriptionForm";
+import PrescriptionView from "./pages/PrescriptionView";
+import MyPrescriptions from "./pages/MyPrescriptions";
+import Notifications from "./pages/Notifications";
 
 const Layout = ({ children }) => (
   <>
@@ -133,6 +137,8 @@ function App() {
               </Layout>
             }
           />
+
+          {/* Kết quả khám */}
           <Route
             path="/medical-result/:bookingId"
             element={
@@ -157,6 +163,41 @@ function App() {
               </Layout>
             }
           />
+
+          {/* Đơn thuốc */}
+          <Route
+            path="/prescription/:bookingId"
+            element={
+              <Layout>
+                <PrescriptionForm />
+              </Layout>
+            }
+          />
+          <Route
+            path="/prescription-view/:id"
+            element={
+              <Layout>
+                <PrescriptionView />
+              </Layout>
+            }
+          />
+          <Route
+            path="/my-prescriptions"
+            element={
+              <Layout>
+                <MyPrescriptions />
+              </Layout>
+            }
+          />
+          <Route
+            path="/notifications"
+            element={
+              <Layout>
+                <Notifications />
+              </Layout>
+            }
+          />
+
           <Route
             path="/login"
             element={

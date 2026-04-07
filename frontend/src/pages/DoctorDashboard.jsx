@@ -413,6 +413,15 @@ const DoctorDashboard = () => {
                   >
                     📝 Phiếu khám
                   </button>
+
+                  <Link
+                    to={`/prescription/${b.id}`}
+                    className="btn btn-outline btn-sm"
+                    style={{ textAlign: "center" }}
+                  >
+                    💊 Kê đơn
+                  </Link>
+
                   <select
                     className="form-control"
                     style={{ fontSize: "0.82rem", padding: "6px 10px" }}

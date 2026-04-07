@@ -1,4 +1,5 @@
 const { Booking, Doctor, User, Schedule, Allcode } = require("../models");
+const { notify } = require("../utils/notificationHelper");
 const { v4: uuidv4 } = require("uuid");
 
 const createBooking = async (req, res) => {
@@ -54,6 +55,24 @@ const createBooking = async (req, res) => {
 
     await schedule.increment("currentNumber");
 
+    // Thông báo cho bác sĩ
+    try {
+      const doctor = await Doctor.findByPk(doctorId, {
+        include: [{ model: User, as: "userData" }],
+      });
+      if (doctor?.userData) {
+        const timeLabel = booking.timeType;
+        await notify.bookingNew(
+          doctor.userData.id,
+          patientName,
+          date,
+          timeLabel,
+          booking.id,
+        );
+      }
+    } catch (e) {
+      console.error("Notify error:", e.message);
+    }
     return res.status(201).json({
       errCode: 0,
       message: "Booking created successfully",
@@ -125,7 +144,48 @@ const updateBookingStatus = async (req, res) => {
     const booking = await Booking.findByPk(id);
     if (!booking)
       return res.status(404).json({ errCode: 1, message: "Booking not found" });
+    const oldStatus = booking.statusId;
     await booking.update({ statusId });
+
+    // Thông báo khi xác nhận hoặc hủy
+    try {
+      if (statusId === "S2" && oldStatus !== "S2") {
+        const doctor = await Doctor.findByPk(booking.doctorId, {
+          include: [{ model: User, as: "userData" }],
+        });
+        const doctorName = doctor?.userData
+          ? `${doctor.userData.lastName} ${doctor.userData.firstName}`
+          : "Bác sĩ";
+        if (booking.patientId) {
+          await notify.bookingConfirmed(
+            booking.patientId,
+            doctorName,
+            booking.date,
+            booking.timeType,
+            booking.id,
+          );
+        }
+      }
+      if (statusId === "S4" && oldStatus !== "S4") {
+        const doctor = await Doctor.findByPk(booking.doctorId, {
+          include: [{ model: User, as: "userData" }],
+        });
+        const doctorName = doctor?.userData
+          ? `${doctor.userData.lastName} ${doctor.userData.firstName}`
+          : "Bác sĩ";
+        if (booking.patientId) {
+          await notify.bookingCancelled(
+            booking.patientId,
+            doctorName,
+            booking.date,
+            booking.id,
+          );
+        }
+      }
+    } catch (e) {
+      console.error("Notify error:", e.message);
+    }
+
     return res.json({ errCode: 0, message: "Booking updated", data: booking });
   } catch (err) {
     return res.status(500).json({ errCode: -1, message: err.message });

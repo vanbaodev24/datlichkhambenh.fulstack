@@ -3,6 +3,9 @@ const MedicalResult = require("./MedicalResult");
 const MedicalHistory = require("./MedicalHistory");
 const ExaminationRecord = require("./ExaminationRecord");
 const ConsultationRecord = require("./ConsultationRecord");
+const Prescription = require("./Prescription");
+const PrescriptionItem = require("./PrescriptionItem");
+const Notification = require("./Notification");
 const Doctor = require("./Doctor");
 const Specialty = require("./Specialty");
 const Clinic = require("./Clinic");
@@ -158,6 +161,44 @@ Booking.hasOne(ConsultationRecord, {
   as: "consultationRecord",
   ...FK,
 });
+
+Prescription.belongsTo(Booking, {
+  foreignKey: "bookingId",
+  as: "bookingData",
+  ...FK,
+});
+Prescription.belongsTo(Doctor, {
+  foreignKey: "doctorId",
+  as: "doctorData",
+  ...FK,
+});
+Prescription.belongsTo(User, {
+  foreignKey: "patientId",
+  as: "patientData",
+  ...FK,
+});
+Prescription.hasMany(PrescriptionItem, {
+  foreignKey: "prescriptionId",
+  as: "items",
+  ...FK,
+});
+PrescriptionItem.belongsTo(Prescription, {
+  foreignKey: "prescriptionId",
+  as: "prescription",
+  ...FK,
+});
+Booking.hasOne(Prescription, {
+  foreignKey: "bookingId",
+  as: "prescription",
+  ...FK,
+});
+Notification.belongsTo(User, { foreignKey: "userId", as: "receiver", ...FK });
+Notification.belongsTo(User, { foreignKey: "senderId", as: "sender", ...FK });
+User.hasMany(Notification, {
+  foreignKey: "userId",
+  as: "notifications",
+  ...FK,
+});
 module.exports = {
   User,
   Doctor,
@@ -170,4 +211,7 @@ module.exports = {
   MedicalHistory,
   ExaminationRecord,
   ConsultationRecord,
+  Prescription,
+  PrescriptionItem,
+  Notification,
 };

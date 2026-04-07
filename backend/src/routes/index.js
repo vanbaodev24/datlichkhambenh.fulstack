@@ -169,6 +169,32 @@ router.get(
   examinationCtrl.getAllExaminations,
 );
 
+// === PRESCRIPTIONS ===
+const prescriptionCtrl = require("../controllers/prescriptionController");
+router.post(
+  "/prescriptions",
+  verifyToken,
+  isDoctor,
+  prescriptionCtrl.upsertPrescription,
+);
+router.get(
+  "/prescriptions/booking/:bookingId",
+  verifyToken,
+  prescriptionCtrl.getByBooking,
+);
+router.get(
+  "/prescriptions/patient",
+  verifyToken,
+  prescriptionCtrl.getPatientPrescriptions,
+);
+router.get(
+  "/prescriptions/doctor",
+  verifyToken,
+  isDoctor,
+  prescriptionCtrl.getDoctorPrescriptions,
+);
+router.get("/prescriptions/:id", verifyToken, prescriptionCtrl.getById);
+
 // === CONSULTATION RECORDS ===
 const consultationCtrl = require("../controllers/consultationController");
 router.post(
@@ -199,6 +225,26 @@ router.get(
   verifyToken,
   isAdmin,
   consultationCtrl.getAllConsultations,
+);
+
+// === NOTIFICATIONS ===
+const notificationCtrl = require("../controllers/notificationController");
+router.get("/notifications", verifyToken, notificationCtrl.getMyNotifications);
+router.get(
+  "/notifications/unread-count",
+  verifyToken,
+  notificationCtrl.getUnreadCount,
+);
+router.put("/notifications/:id/read", verifyToken, notificationCtrl.markAsRead);
+router.put(
+  "/notifications/read-all",
+  verifyToken,
+  notificationCtrl.markAllAsRead,
+);
+router.delete(
+  "/notifications/:id",
+  verifyToken,
+  notificationCtrl.deleteNotification,
 );
 
 // === PATIENT PROFILE ===
